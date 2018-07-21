@@ -2,7 +2,7 @@
 #include "Arduino.h"
 #include "serialComm.h"
 #include "globals.h"
-
+#include <EEPROM.h>
 
 // how much serial data we expect before a newline
 const unsigned int MAX_INPUT = 250;
@@ -337,6 +337,22 @@ void processCommand(char* command){
       }
     }
   }
+  
+  if (strcmp(cmd_code,"SET_ID") == 0) {
+    //Serial.println("");
+    //Serial.println("Set device ID...");
+    cmd_code = strtok(NULL, ":");
+    int i = 0;
+    while( cmd_code != NULL ){
+      //Serial.print("cmd chunk, device ID: ");
+      //Serial.println(cmd_code);
+      int devID = strtol(cmd_code,0,0);
+      EEPROM.put(0x00, devID);
+      cmd_code = strtok(NULL, ":");
+      i++;
+    }
+    //deviceID = devID;
+  }  
   
 }
 
