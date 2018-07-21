@@ -9,9 +9,10 @@
 #include "serialComm.h"
 #include "globals.h"
 #include <TimerThree.h>
+#include <EEPROM.h>
 
 #define BAUD 57600
-#define VERSION "1.2"
+#define VERSION "1.3"
 
 Bounce          SWITCH_ARRAY[MAX_NR_SWITCHES] ;
 Potentiometer   POT_ARRAY[MAX_NR_POTS];
@@ -25,6 +26,8 @@ int16_t         currentEncoderValues[MAX_NR_ENCODERS];
 
 unsigned long current_time;
 unsigned long last_time;
+
+unsigned int deviceID;
 
 void timerIsr() {
   /*for (int i = 0; i < MAX_NR_SERVOS; i++) {
@@ -52,9 +55,15 @@ void setup() {
     currentEncoderValues[i] = 0; 
   }
   
-  
   last_time = millis();
+
+  // Get 2-byte device ID from address 0x00 in EEPROM
+  // Some Arduinos do not have a USB serial number,
+  // so we'll keep track of them with this.
+  EEPROM.get( 0, deviceID);
+
 }
+
 int val = 0;
 int angle = 0; 
 bool firstloop = true;
@@ -120,6 +129,7 @@ void loop() {
   if (firstloop == true){ 
     Serial.print("READY;");
     Serial.print("VERSION:"+(String)VERSION+";");
+    Serial.print("ID:0x"+(String(deviceID,HEX))+";");
     firstloop = false;
   }
   /**
